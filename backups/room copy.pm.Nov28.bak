@@ -1,0 +1,221 @@
+package room;
+
+use strict; use warnings; use perl_profile;
+use set;
+use FindBin '$Bin'; # other programs such as morbo may also use Bin and ruin our bin.
+say "findbin is $FindBin::Bin and bin is $Bin";
+
+######################################### GLOBALS ########################################
+our %nametoroom = ();
+
+#################################### HELPER FUNCTIONS ####################################
+our @namepool = ();
+open( my $FH, '<', 'public/lexis.txt' ) or die 'Could not open the lexis!!!';
+    push @namepool => &trim($_) while( <$FH> );
+close( $FH ) or die 'Could not CLOSE the lexis!';
+
+sub rand_name{
+    my $randindex = int( $#namepool * rand() );
+    return $namepool[$randindex]
+}
+
+sub name_to_room{ # creates a new room if necessary
+    my ($name) = @_;
+    return $nametoroom{$name} //= room->new(name=>$name) or die 'Bad room name string!' # adds the room to our hash if necessary
+}
+
+sub subtract{
+	my ($long,$short) = @_;
+	return substr( $long, length $short )
+}
+
+######################################## NEW ROOM ########################################
+sub new{
+	my $packagename = shift;
+	my %options = @_; # includes the NAME of the room.
+	my $room = bless { %options, shh=>undef, controllers=>set->new, output=>'', prompt=>undef } => $packagename;
+	# initialize stuff...
+	$room->open_shell('bash'); # this function also populates the shell handle for room.
+	return $room
+}
+
+########################################## ROOM ##########################################
+
+sub prompt{
+	my $room = shift;
+	return $$room{prompt} // 'MFQCLYDSHREDKZKJ' # the prompt is the delimiter.  We don't want to accidentally come across a false delimiter.
+}
+
+sub htmlify{ # this takes any amount of terminal stdout and converts it to html.
+	my $room = shift;
+	my ($str) = @_;
+	# put a span around the commands...
+	my $prompt = quotemeta( $room->prompt );
+	$str =~ s|^(.*)\n|<span class="command">$1</span>\n|; # the very first command is NOT preceded by a prompt.
+	$str =~ s|\n?$prompt(.*)\n|\n<span class="command">$1</span>\n|g; # this also makes sure that prompts always start on new lines.
+	$str =~ s|\n?$prompt$|\n|; # delete final prompt.  Also, all endings have newlines regardless of what bash outputted.
+	$str =~ s|</span>\n$|\n\n|g; # for an outputless command, let's display an empty line to show that.
+	$str =~ s|\n|<br />|g;
+	return $str
+}
+
+sub name{
+	my $room = shift;
+	return $$room{name}
+}
+
+sub SHH{
+	my $room = shift;
+	my ($SHH) = @_;
+	return $$room{shh} = $SHH // $$room{shh} # this is NOT the same as //=
+}
+
+sub close_SHH{
+	my $room = shift;
+	$$room{shh} = undef;
+	return 1
+}
+
+sub controllers{ # this is a SET of controllers
+	my $room = shift;
+	return $$room{controllers}
+}
+sub add_controller{
+	my $room = shift;
+	my ($controller) = @_;
+	$room->controllers->add_element($controller)
+}
+sub remove_controller{ say 'removing a controller...';
+	my $room = shift;
+	my ($controller) = @_;
+	$room->controllers->remove_element($controller);
+	# check if the room is empty.  if so, close the room.
+	if( $room->controllers->is_empty ){ say 'closing the room...'; $room->close }
+}
+
+sub output{ # gets all the output of a room for a new self joining in
+	my $room = shift;
+	return $$room{output}
+}
+
+sub append_to_output{
+	my $room = shift;
+	my ($string) = @_;
+	$$room{output} .= $string;
+}
+
+sub append{
+	my $room = shift;
+	my ($string) = @_;
+	$room->append_to_output($string);
+	my $html = $room->htmlify($string);
+	$room->jblast( command=>'append', output=>$html );
+	#say "output is now $$room{output}";
+}
+
+sub jblast{ # blast is replaced with jblast, which includes the json in it
+	my $room = shift;
+	#say 'jblasting to '.scalar $room->controllers->array.' controllers.';
+	my %ball = @_; say 'ball is '."@_";
+	foreach( $room->controllers->array ){ #say 'i have a controller '."$_";
+		$_->jsend(%ball)
+	}
+	#say 'done WITH CONTROLLERS';
+}
+
+use overload
+	'""' => \&stringify;
+
+sub stringify{
+	my $room = shift;
+	my $toprint;
+	{
+	local $" = ',';
+		$toprint .= 'Roomname is '.$room->name."\n";
+		my @controllers = $room->controllers->array; $toprint .= "Controllers are: @controllers\n";
+	}
+	return $toprint
+}
+
+sub get_latest_output{
+	my $room = shift;
+	# outnow will not be equal to room->output because the command is in there
+	# this means that even if output hasn't come out yet, we think it's done! :(
+	# the solution is to wait for output to end with the PROMPT :)
+	my $outnow; my $stop; my $PS1 = quotemeta( $room->prompt ); # assuming the prompt won't change
+	do{
+		my $name = quotemeta $room->name;
+		$outnow = `cat < $Bin/rooms/$name.out.txt`;
+		++$stop;
+	}while( $outnow !~ /$PS1$/ and print "stop is $stop.  " and $stop < 99 );
+	unless( defined $outnow ){ die 'outnow is not defined.' } # for debugging only
+	return my $outappend = subtract( $outnow, $room->output );
+}
+
+sub command{ # executes a shell command and relays the output to all controllers.
+	my $room = shift;
+	my ($command) = @_; # incoming command does not have a \n at the end.
+	#say "command is $command"; #say "Bin is $Bin";
+	# capture special room commands: shells
+	if( $command =~ /^(shell) +([^ ]*)/i ){
+        my $argument = $2;
+        use Switch;
+        switch($1){
+            case 'shell' { # the argument has already been verified in $self->command
+	            $room->change_shell($argument);
+	            $room->jblast( command=>'set', id=>'shell', html=>$argument );
+	            $room->jblast( command=>'alert', string=>"shell changed to $argument" );
+	        }
+        }
+    }
+    else{ #say 'hi';
+		my $SHH = $room->SHH; print $SHH "$command\n"; # \n is needed at the end of the command to send it, of course.
+		# get the output somehow AND also store it into a package string.
+		my $outappend = $room->get_latest_output; #say "got output: $output.END";
+		$room->append($outappend);
+	}
+}
+
+
+# THE ISSUE IS THAT THE NEW SHELL IS OVERRITING THE OLD FILE, WHEN IT SHOULD BE APPENDING
+# LET'S TRY CHANGING > TO >>
+# nope
+# let's try restarting the whole history thing when there is a new shell?
+sub open_shell{
+	my $room = shift;
+	my ($shell) = @_;
+	# tested on Macbook Air::::::
+	# interactive mode works for bash, sh, but NOT zsh
+	# non-interactive mode works for bash, zsh, sh
+	# interactive mode shows the prompts, non-interactive shows just the outputs
+	# not tested:::::
+	# rbash, dash,
+	my $name = quotemeta $room->name;
+	open( my $SHH, '|-', qq($shell -i &>$Bin/rooms/$name.out.txt) ) or die "Could not open the $shell shell!";
+	$room->SHH($SHH);
+	print $SHH 'PS1='.$room->prompt."\n";
+}
+
+sub close_shell{
+	my $room = shift;
+	$room->command('exit 0');
+	close( $room->SHH ) or die 'could not close the room by the shell handle';
+	$room->close_SHH; # We do NOT need or want to use this shell handle anymore.
+}
+
+sub change_shell{
+	my $room = shift;
+	my ($shell) = @_;
+	$room->close_shell;
+	$room->open_shell($shell);
+}
+
+sub close{
+	my $room = shift;
+	$room->close_shell;
+	# tell each controller in the room to leave the room (reset roomname attribute, remove self from room->controllers, update GUI
+	foreach my $self ( $room->controllers->array ){ $self->leave_room }
+	delete $nametoroom{ $room->name }; # delete the room from the nametoroom hash
+}
+
+1

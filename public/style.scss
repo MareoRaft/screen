@@ -1,0 +1,96 @@
+@import 'reset';
+
+$bottomborderwidth: 50px;
+
+body, html { //these are needed for the percentages to work properly and the scrolling
+  height: 100%;
+  width: 100%;
+  margin: 0;
+}
+
+$black: #111; $darkgrey: #333; $grey: #555; $lightgrey: #777; $transgrey: rgba( 80, 80, 80, 0.5 );
+$white: #eee; $darkwhite: #999;
+
+$pink: #f12772; $gold: #e6d460; $blue: #0af; $brightgreen: #a6de2a; $green: #0d0;
+
+@mixin font {
+  color: $white;
+  font-family: Monaco, "Lucida Console", Courier, "Courier New", monospace;
+  font-size: 0.9rem; //0.9rem == 14px
+  line-height: 1.2rem; //1.2 rem ~~ 19px
+}
+
+body {
+  @include font;
+  padding-bottom: 16px; background-color: $lightgrey;
+  border-bottom: $bottomborderwidth solid $grey;
+}
+
+%section_box{
+  padding: 14px 14px 0px 14px; background-color: $darkgrey;
+}
+%section_content{
+  border: 2px solid $grey;
+  padding: 8px;
+  width: 100%; height: 100%;
+  overflow: scroll;
+  background-color: $black;
+  @include font;
+}
+
+header {
+  position: absolute; left: 0; top: -10rem; // temporarily hidden
+  height: 5rem;
+  width: 100%;
+  background-color: rgba( black, 0.8 );
+  @include font; font-size: 2.8rem; line-height: 5rem; text-align: center;
+  transition: top 1s ease;
+}
+
+#output {
+  @extend %section_box;
+  height: 80%;
+  #content{
+    @extend %section_content;
+    .argument{
+      color: $darkwhite;
+    }
+    .prompt{
+      color: $gold;
+    }
+    .command{
+      color: $gold;
+    }
+  }
+}
+
+#input {
+  @extend %section_box;
+  height: 20%;
+  textarea {
+    @extend %section_content;
+    color: $gold;
+    outline: 0;
+  }
+}
+
+footer {
+  @extend %section_box;
+  height: 0;
+  border-bottom: 1px solid $black;
+  @include font; line-height: 3.7rem; color: $darkwhite;
+  div {
+    height: $bottomborderwidth;
+    width: 100%;
+    white-space: nowrap;
+    overflow-x: scroll;
+    overflow-y: hidden; // this is the only way to prevent vertical scrolling
+
+    #shell{ color: $pink; }       #wholeshell{ }
+    #screen{ color: $pink; }      #wholescreen{ display: none; }
+    #username{ color: $blue; }    #wholeusername{ }
+    #roomname{ color: $blue; }    #wholeroomname{ }
+    #status{ color: $pink; }     #wholestatus{ }
+    #usersinroom{ color: $blue; } #wholeusersinroom{ display: none; }
+  }
+}

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Screen</title>
+	<meta charset='UTF-8'>
+	<%# mojolicious automatically makes the PUBLIC folder your base %>
+	<link rel='stylesheet' href='/style.css' /> <%# the slash is necessary %>
+	<script src='//code.jquery.com/jquery-1.11.0.min.js'></script> <%# type='text/javascript' not neccessary and NOT ALLOWED in html 5 %>
+	<script src='//code.jquery.com/jquery-migrate-1.2.1.min.js'></script>
+	<%#script src='/jss.js'></script> <%# let's try to use jQuery's built in .css command instead %>
+	<script src='<%= url_for('javascript')->to_abs %>'></script>
+</head>
+<body>
+	<header>
+			Screen.^ \$<pre>  </pre>session #514
+	</header>
+	<section id='output'>
+		<div id='content'>
+			<span style='color:gold'>Welcome to Screen!</span>
+			<br />Type a roomname in the input box below, then hit RETURN.  A blank input will give you a random room.  A shell name will bring you into the main room for that shell.
+			<br /><br />Shells:
+			<br />bash, rbash
+			<br />dash
+			<br />sh, static-sh, sh.distrib
+			<br />csh, bsd-csh, tcsh
+			<br />ksh, ksh93
+			<br />zsh, zsh5, rzsh
+
+			<br /><br />help:
+			The following Screen commands help you to get around!  Type them into the prompt the same way you would execute a terminal command.  To escape them and get a regular terminal command, begin with a space.
+			<br /><br />user<br />room<br />connect<br />disconnect<br />help
+		</div>
+	</section>
+	<section id='input'>
+		<textarea></textarea>
+	</section>
+	<footer>
+		<div>
+			<span id='wholeshell'>			Shell: <span id='shell'>Bash</span>													</span>
+			<span id='wholeusername'>		<pre>   </pre>User: <span id='username'>John</span>									</span>
+			<span id='wholeroomname'>		<pre>   </pre>Room: <span id='roomname'>None</span>									</span>
+			<span id='wholestatus'>			<pre>   </pre>Status: <span id='status'>Connected</span>							</span>
+			<span id='wholeusersinroom'>	<pre>   </pre>Others In Room: <span id='usersinroom'>Andy, Ken, Roswell</span>		</span>
+			<span id='wholescreen'>			<pre>   </pre>Screen<span id='screen'>.^ \$</span>									</span>
+		</div>
+	</footer>
+</body>
+</html>

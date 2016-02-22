@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Screen</title>
+	<meta charset='UTF-8'>
+	<%# mojolicious automatically makes the PUBLIC folder your base %>
+	<link rel='stylesheet' href='/style.css' /> <%# the slash is necessary %>
+
+	<%# type='text/javascript' not neccessary and NOT ALLOWED in html 5 %>
+	<%#script src='//code.jquery.com/jquery-migrate-1.2.1.min.js'></script%>
+	<script src='jquery-1.11.1.min.js'></script>
+	<script src='<%= url_for('javascript')->to_abs %>'></script>
+</head>
+<body>
+	<header>
+			Screen.^ \$<pre>  </pre>session #514
+	</header>
+	<section id='output'>
+		<div id='content'>
+			<!-- this is where all the content html will go.  it is populated by javascript.-->
+			Your javascript may not be running.  Javascript is essential for this program.
+			<br />
+			<br />The other possibility is that you are not in a room.  Try typing 'room kitchen' to join a room.
+		</div>
+	</section>
+	<section id='input'>
+		<textarea></textarea>
+	</section>
+	<footer>
+		<div>
+			<span id='wholeshellname'>					  Shell: <span id='shellname'>None</span>								</span>
+			<span id='wholeusername'>		<pre>   </pre>User: <span id='username'>Anonymous</span>							</span>
+			<span id='wholeroomname'>		<pre>   </pre>Room: <span id='roomname'>None</span>									</span>
+			<span id='wholestatus'>			<pre>   </pre>Status: <span id='status'>Disconnected</span>							</span>
+			<span id='wholeusersinroom'>	<pre>   </pre>Others In Room: <span id='usersinroom'>Andy, Ken, Roswell</span>		</span>
+			<span id='wholescreen'>			<pre>   </pre>Screen<span id='screen'>.^ \$</span>									</span>
+		</div>
+	</footer>
+</body>
+</html>

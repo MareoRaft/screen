@@ -1,0 +1,49 @@
+/////////////////////////////////////////////// SETUP /////////////////////////////////////////////
+(function ($) { $(document); }(jQuery)) // this makes sure that $ always refers to jQuery.
+
+var ws; if ("WebSocket" in window){ ws = new WebSocket('<%= url_for('websocket')->to_abs %>') }
+else{ alert( 'Your browser does not support websockets, which are essential for this program.') }
+
+////////////////////////////////////////////// GLOBALS ////////////////////////////////////////////
+
+
+////////////////////////////////////////////// HELPERS ////////////////////////////////////////////
+function jsend(object){
+    ws.send(JSON.stringify( object ))
+    //alert('json sent')
+}
+
+
+///////////////////////////////////////// INCOMING COMMANDS ///////////////////////////////////////
+ws.onmessage = function(event) {
+    var j = JSON.parse(event.data)
+    if( j.output !== 'undefined' ) $('#content').append(j.output);
+    if( j.command !== 'undefined' ){ 
+        switch(j.command){
+        case 'set': $('#'+j.id).text(j.html)
+            if( j.color !== 'undefined' ){
+                //alert('col'+j.color);
+                $('#'+j.id).css('color',j.color);
+            }
+            $('#whole'+j.id).css('display','inline') // make sure it is showing too!
+            break
+        case 'hide': $('#whole'+j.id).css('display','none')
+            break
+        case 'append': alert('appending!')
+        alert('ap: '+j.output)
+        $('#content').append(j.output)
+    }}
+}
+
+//////////////////////////////////////// OUTGOING AND EVENTS //////////////////////////////////////
+$(document).ready( function() {
+    $('header').click( function() {
+        alert('going up!')
+        jss.set( 'header', {'top': '-90px'} )
+    })
+    $('textarea').keyup( function(event) { if( event.which == 13 ){
+        var input = $(this).val()
+        $(this).val('') // clear the input area
+        jsend({ 'command':'command', 'input':input })
+    }})
+})

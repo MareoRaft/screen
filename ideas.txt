@@ -1,0 +1,12 @@
+make commands like 'help' and 'clear' resolve within javascript without sending a message back and forth with websockets!  capture blank sends.
+
+
+
+
+
+
+Try switching Amazon Server over to FreeBSD 9, which is the child of BSD, which is the Unix OS developed at Berkeley.
+
+(This is an attempt to be as similar to OSX's Unix as possible.)  It is a free Tier server.
+
+We will need to transfer Chessmojo and see if anything else is on there.

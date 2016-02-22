@@ -1,0 +1,83 @@
+/////////////////////////////////////////////// SETUP /////////////////////////////////////////////
+(function($){ $(document) }(jQuery)) // makes sure that $ always refers to jQuery. Outer parenthesis necessary.
+
+var ws; if ('WebSocket' in window){ ws = new WebSocket('<%= url_for('websocket')->to_abs %>') }
+else{ alert('Your browser does not support websockets, which are essential for this program.') }
+
+////////////////////////////////////////////// GLOBALS ////////////////////////////////////////////
+var welcome = [
+    '<span style="color:gold">Welcome to Screen!</span>',
+    '<br />The following Screen commands help you to get around!  Type them into the prompt the same way you would execute a terminal command.  To escape them and get a regular terminal command, begin with a space.',
+    '<br />',
+    '<br />user <span class="argument">username</span>',
+    '<br />room <span class="argument">roomname</span>',
+    '<br />shell <span class="argument">bash|rbash|<wbr />dash|<wbr />sh|static&#8209;sh|sh.distrib|<wbr />csh|bsd&#8209;csh|tcsh|<wbr />ksh|ksh93|<wbr />zsh|zsh5|rzsh</span><!-- &#8209; is a NON word-breaking hyphen -->',
+    '<br />help',
+    '<br />',
+].join('')
+var divider = '<br />###############################################################<br />'
+var help = divider + welcome + divider
+
+////////////////////////////////////////////// HELPERS ////////////////////////////////////////////
+function jsend(object){
+    ws.send(JSON.stringify( object ))
+    //alert('json sent')
+}
+
+function Capitalize(string){
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()
+}
+
+function scroll_to_end(){
+    $('#content').animate({ scrollTop: $('#content').prop('scrollHeight') }, 'slow')
+}
+
+function clear_screen(){
+    $('#content').html('')
+    $('#content').append(welcome+'<br />')
+    scroll_to_end()
+}
+
+///////////////////////////////////////// INCOMING COMMANDS ///////////////////////////////////////
+ws.onmessage = function(event) {
+    var j = JSON.parse(event.data)
+    if( j.command !== 'undefined' ){
+    switch(j.command){
+        case 'set': $('#'+j.id).text( Capitalize(j.html) )
+            if( j.color !== 'undefined' ) $('#'+j.id).css('color',j.color);
+            $('#whole'+j.id).css('display','inline') // make sure it is showing too!
+            break
+        case 'hide': $('#whole'+j.id).css('display','none')
+            break
+        case 'append': $('#content').append(j.output)
+            scroll_to_end()
+            break
+        case 'clear': clear_screen()
+            break
+        case 'alert': alert(j.string)
+            break
+        default: alert('Received unknown command "'+j.command+'"')
+    }}
+}
+//$(ws).on( 'message', '#content', function(){ ...another way to do it
+
+//////////////////////////////////////// OUTGOING AND EVENTS //////////////////////////////////////
+$(document).ready( function() {
+    // you can put as many functions as you want in here
+    $('textarea').keyup( function(event) { if( event.which == 13 ){
+        var input = $(this).val()
+        $(this).val('') // clear the input area
+        input = input.replace(/\n/g,'') // get rid of stray newlines (user could have hit enter anywhere in the line)
+        switch(input){
+            case '': // do nothing
+                break
+            case 'clear': clear_screen()
+                break
+            case 'help': $('#content').append(help)
+                scroll_to_end()
+                break
+            default: jsend({ 'command':'command', 'input':input })
+        }
+    }})
+})
+
