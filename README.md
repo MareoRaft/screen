@@ -1,3 +1,12 @@
+Screen
+=========
+
+The Screen website can be viewed [here](http://192.241.177.163:8000)!
+
+You can read a little about Screen [here](http://code.instructorium.com/screen/).
+
+
+
 check that stuff is flushing.
 
 
