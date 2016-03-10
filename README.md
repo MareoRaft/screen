@@ -22,10 +22,10 @@ su root
 sh
 
 PERL5LIB=.
-export PERL5LIB=/usr/home/ec2-user/Library/Perl/5.16/Downloads"${PERL5LIB:+:$PERL5LIB}"
-export PERL5LIB=/usr/home/ec2-user/Library/Perl/5.16/Downloads/darwin-thread-multi-2level"${PERL5LIB:+:$PERL5LIB}"
-export PERL5LIB=/usr/home/ec2-user/Library/Perl/5.16/Custom"${PERL5LIB:+:$PERL5LIB}"
-export PERL5LIB=/usr/home/ec2-user/Library/Perl/5.16/Custom/darwin-thread-multi-2level"${PERL5LIB:+:$PERL5LIB}"
+export PERL5LIB=/home/freebsd/Library/Perl/5.16/Downloads"${PERL5LIB:+:$PERL5LIB}"
+export PERL5LIB=/home/freebsd/Library/Perl/5.16/Downloads/darwin-thread-multi-2level"${PERL5LIB:+:$PERL5LIB}"
+export PERL5LIB=/home/freebsd/Library/Perl/5.16/Custom"${PERL5LIB:+:$PERL5LIB}"
+export PERL5LIB=/home/freebsd/Library/Perl/5.16/Custom/darwin-thread-multi-2level"${PERL5LIB:+:$PERL5LIB}"
 
 perl mojo.pl daemon -l http://172.31.45.196:8000
 
