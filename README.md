@@ -1,9 +1,9 @@
 Screen
 =========
 
-The Screen website can be viewed [here](http://192.241.177.163:8000)!
+The Screen website can be viewed [here](http://learnnation.org/screen.html)!
 
-You can read a little about Screen [here](http://code.instructorium.com/screen/).
+You can read a little about Screen [here](http://learnnation.org/screen-about).
 
 
 
