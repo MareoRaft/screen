@@ -40,3 +40,20 @@ perl mojo.pl daemon -l http://192.241.177.163:8000
 
 use the PRIVATE IP ADDRESS (not public, and not localhost)
 
+
+
+FreeBSD 11.1 digital ocean server kick-off directions:
+---------------------------------------------------------
+
+sudo pkg install git
+git clone this project
+cd into this project
+sh
+cpan
+cpan install Mojolicious::Lite
+cpan install Time::Stamp
+PERL5LIB=.
+perl mojo.pl daemon -l http://PRIVATEIP:8000
+
+
+
