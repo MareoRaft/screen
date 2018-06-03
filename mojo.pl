@@ -5,7 +5,9 @@ use feature 'switch';
 use helpers;
 use self; # adds extra capabilities to '$self' (a Mojolicious::Controller)
 
-################################################# DEFAULT VARIABLES ###############################################
+################################################# HYPNOTOAD ###############################################
+# if using hypnotoad, configure the port
+app->config(hypnotoad => {listen => ['http://*:8000']});
 
 ####################################################### MOJO ######################################################
 get '/' => sub{
