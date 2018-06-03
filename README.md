@@ -1,6 +1,9 @@
 Screen
 =========
 
+** Note that while Screen was a cool idea, it could not handle *interactive* command-line programs due to issues with piping.  Screen is currently mostly disabled.  You may view the website, but you can't interact much with the server.
+
+
 The Screen website can be viewed [here](http://learnnation.org/screen.html)!
 
 You can read a little about Screen [here](http://learnnation.org/screen-about).
