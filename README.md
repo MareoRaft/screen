@@ -53,6 +53,6 @@ cpan install Mojolicious::Lite
 cpan install Time::Stamp  
 PERL5LIB=.  
 perl mojo.pl daemon -l http://PRIVATEIP:8000  
-
+alternatively, try hypnotoad mojo.pl
 
 
